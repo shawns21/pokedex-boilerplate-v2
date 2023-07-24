@@ -1,4 +1,7 @@
 const express = require("express");
+const morgan = require("morgan");
+const pokeList = require("./views/pokeList");
+const pokeDetails = require("./views/pokeDetails");
 const app = express();
 const Pokemon = require("./models/Pokemon");
 const Trainer = require("./models/Trainer");
@@ -14,17 +17,19 @@ const db = require("./db");
 })();
 
 
-app.get("/", (req, res) => res.send("Welcome to the Pokedex"));
+app.get("/", (req, res) => {
+  res.send("Welcome to Pokedex");
+});
 
 app.get("/pokemon", async (req, res) => {
   const pokemon = await Pokemon.findAll();
-  res.json(pokemon);
+  res.send(pokeList(pokemon));
 });
 
 app.get("/pokemon/:id", async (req, res) => {
   const pokemon = await Pokemon.findByPk(req.params.id);
   if (pokemon) {
-    res.json(pokemon);
+    res.send(pokeDetails(pokemon));
   } else {
     res.status(404).send("Pokemon not found");
   }
@@ -59,7 +64,7 @@ app.put("/pokemon/:id", async (req, res) => {
   const pokemon = await Pokemon.findByPk(req.params.id);
   if (pokemon) {
     await pokemon.update({ name: "PARKACHU"});
-    res.json(pokemon);
+    res.send(pokeDetails(pokemon));
   } else {
     res.status(404).send("Pokemon not found");
   }
